@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>AI Diet Planner</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+<div class="container">
+
+<h1>AI Personalized Diet Planner</h1>
+
+<form action="/generate" method="post">
+
+<label for="goal">Select Your Goal:</label>
+<select name="goal">
+<option value="fat_loss">Fat Loss</option>
+<option value="muscle_gain">Muscle Gain</option>
+<option value="maintenance">Maintenance</option>
+<option value="performance">Performance</option>
+</select>
+
+<label for="Weight">Weight(kg):</label>
+<input name="weight" placeholder="Weight (kg)" required>
+
+<label for="Height">Height(cm):</label>
+<input name="height" placeholder="Height (cm)" required>
+
+<label for="age">Age:</label>
+<input name="age" placeholder="Age" required>
+
+<label for="gender">Gender:</label>
+<select name="gender">
+<option value="male">Male</option>
+<option value="female">Female</option>
+</select>
+
+<label for="activity_level">Activity Level:</label>
+<select name="activity_level">
+<option value="sedentary">Sedentary</option>
+<option value="light">Light</option>
+<option value="moderate">Moderate</option>
+<option value="active">Active</option>
+</select>
+
+<label for="body_type">Body Type:</label>
+<select name="body_type">
+<option value="skinny">Skinny</option>
+<option value="average">Average</option>
+<option value="heavy">Heavy</option>
+</select>
+
+<label for="weight_tendency">Weight Tendency:</label>
+<select name="weight_tendency">
+<option value="gain_easy">Gain Easy</option>
+<option value="lose_easy">Lose Easy</option>
+<option value="balanced">Balanced</option>
+</select>
+
+<label for="diet_type">Diet Type:</label>
+<select name="diet_type">
+<option value="veg">Veg</option>
+<option value="nonveg">Non-Veg</option>
+<option value="vegan">Vegan</option>
+</select>
+
+<label for="health_issues">Health Issues:</label>
+<input name="health_issues" placeholder="Health Issues">
+
+<label for="budget">Budget:</label>
+<select name="budget">
+<option value="low">Low Budget</option>
+<option value="medium">Medium Budget</option>
+<option value="high">High Budget</option>
+</select>
+
+<label for="meals_per_day">Meals per day:</label>
+<input name="meals_per_day" placeholder="Meals per day">
+
+<label for="cooking_style">Cooking Style:</label>
+<select name="cooking_style">
+<option value="cook">Cook</option>
+<option value="outside">Eat Outside</option>
+<option value="both">Both</option>
+</select>
+
+<button type="submit">Generate AI Diet Plan</button>
+</form>
+
+{% if result is defined %}
+<div class="result">
+
+<h3>Calories: {{ result.calories }}</h3>
+
+<p>Protein: {{ result.macros.protein_g }}g</p>
+<p>Carbs: {{ result.macros.carbs_g }}g</p>
+<p>Fat: {{ result.macros.fat_g }}g</p>
+
+<h4>AI Diet Plan:</h4>
+<ul>
+{% for m in result.meals %}
+<li>{{ m.food }}</li>
+{% endfor %}
+</ul>
+
+</div>
+{% endif %}
+
+</div>
+</body>
+</html>
