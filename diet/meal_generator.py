@@ -1,40 +1,22 @@
 import os
 from groq import Groq
 
+# ---------------- GROQ CLIENT ----------------
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
+# ---------------- AI DIET RESPONSE ----------------
 def ai_diet_response(user, macros):
 
     prompt = f"""
 You are a professional Indian fitness nutritionist.
 
-Generate a FULL DAY diet plan STRICTLY in this format:
+Create a PERSONALIZED FULL DAY DIET PLAN.
 
-■ Breakfast (time range)
-Food Item – grams
-Food Item – grams
-Approx Macros: Protein X g | Carbs X g | Fats X g | Calories X kcal
-
-■ Lunch (time range)
-Food Item – grams
-Food Item – grams
-Approx Macros: Protein X g | Carbs X g | Fats X g | Calories X kcal
-
-■ Evening Snack (time range)
-Food Item – grams
-Approx Macros: Protein X g | Carbs X g | Fats X g | Calories X kcal
-
-■ Dinner (time range)
-Food Item – grams
-Approx Macros: Protein X g | Carbs X g | Fats X g | Calories X kcal
-
-Rules:
-- Use Indian foods
-- Mention exact quantities in grams
-- Show macros for EACH meal
-- Budget friendly according to user
-- Include veg/nonveg options if applicable
-- NO extra explanation outside this structure
+Use these EXACT targets:
+Calories Target: {user['calories']} kcal
+Protein Target: {macros['protein_g']} g
+Carbs Target: {macros['carbs_g']} g
+Fat Target: {macros['fat_g']} g
 
 User Details:
 Goal: {user['goal']}
@@ -51,16 +33,30 @@ Budget: {user['budget']}
 Meals Per Day: {user['meals_per_day']}
 Cooking Style: {user['cooking_style']}
 
-Target Macros:
-Protein {macros['protein_g']} g
-Carbs {macros['carbs_g']} g
-Fat {macros['fat_g']} g
+STRICT FORMAT RULES (VERY IMPORTANT):
+- Create EXACTLY {user['meals_per_day']} meals.
+- Use this structure for EACH meal:
+
+■ Meal Name (time range)
+Food Item – grams
+Food Item – grams
+Approx Macros: Protein X g | Carbs X g | Fats X g | Calories X kcal
+
+- Leave ONE blank line between meals.
+- Do NOT add explanations outside this format.
+
+Additional Rules:
+- Indian foods only
+- Budget friendly
+- Respect veg/nonveg preference
+- Include hydration suggestion at the end
 """
 
     try:
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
-            messages=[{"role": "user", "content": prompt}]
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.6
         )
 
         return response.choices[0].message.content
@@ -69,6 +65,7 @@ Fat {macros['fat_g']} g
         return f"AI Error: {e}"
 
 
+# ---------------- MAIN FUNCTION ----------------
 def generate_meal_plan(user, macros):
 
     ai_plan = ai_diet_response(user, macros)
