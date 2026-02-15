@@ -56,8 +56,14 @@ async def generate_plan(
         "deficiency": False
     }
 
+    # 🔥 Calculate calories & macros
     calories = calculate_calories(user_data)
     macros = calculate_macros(user_data, calories)
+
+    # ✅ VERY IMPORTANT FIX (ADD THIS LINE)
+    user_data["calories"] = calories
+
+    # AI Meal Plan
     meals = generate_meal_plan(user_data, macros)
     supplements = recommend_supplements(user_data)
     grocery = create_grocery_list(meals)
