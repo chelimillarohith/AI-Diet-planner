@@ -2,7 +2,12 @@
 <html>
 <head>
 <title>AI Diet Planner</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link rel="stylesheet" href="/static/style.css">
+<link rel="icon" href="/static/favicon.ico">
+
 </head>
 
 <body>
@@ -12,7 +17,7 @@
 
 <form action="/generate" method="post">
 
-<label for="goal">Select Your Goal:</label>
+<label>Select Your Goal:</label>
 <select name="goal">
 <option value="fat_loss">Fat Loss</option>
 <option value="muscle_gain">Muscle Gain</option>
@@ -20,22 +25,22 @@
 <option value="performance">Performance</option>
 </select>
 
-<label for="Weight">Weight(kg):</label>
-<input name="weight" placeholder="Weight (kg)" required>
+<label>Weight (kg):</label>
+<input type="number" name="weight" required>
 
-<label for="Height">Height(cm):</label>
-<input name="height" placeholder="Height (cm)" required>
+<label>Height (cm):</label>
+<input type="number" name="height" required>
 
-<label for="age">Age:</label>
-<input name="age" placeholder="Age" required>
+<label>Age:</label>
+<input type="number" name="age" required>
 
-<label for="gender">Gender:</label>
+<label>Gender:</label>
 <select name="gender">
 <option value="male">Male</option>
 <option value="female">Female</option>
 </select>
 
-<label for="activity_level">Activity Level:</label>
+<label>Activity Level:</label>
 <select name="activity_level">
 <option value="sedentary">Sedentary</option>
 <option value="light">Light</option>
@@ -43,69 +48,123 @@
 <option value="active">Active</option>
 </select>
 
-<label for="body_type">Body Type:</label>
+<label>Body Type:</label>
 <select name="body_type">
 <option value="skinny">Skinny</option>
 <option value="average">Average</option>
 <option value="heavy">Heavy</option>
 </select>
 
-<label for="weight_tendency">Weight Tendency:</label>
+<label>Weight Tendency:</label>
 <select name="weight_tendency">
 <option value="gain_easy">Gain Easy</option>
 <option value="lose_easy">Lose Easy</option>
 <option value="balanced">Balanced</option>
 </select>
 
-<label for="diet_type">Diet Type:</label>
+<label>Diet Type:</label>
 <select name="diet_type">
 <option value="veg">Veg</option>
 <option value="nonveg">Non-Veg</option>
 <option value="vegan">Vegan</option>
+<option value="both veg & non veg">both veg & non veg</option>
 </select>
 
-<label for="health_issues">Health Issues:</label>
-<input name="health_issues" placeholder="Health Issues">
+<label>Health Issues:</label>
+<input name="health_issues">
 
-<label for="budget">Budget:</label>
+<label>Budget:</label>
 <select name="budget">
 <option value="low">Low Budget</option>
 <option value="medium">Medium Budget</option>
 <option value="high">High Budget</option>
 </select>
 
-<label for="meals_per_day">Meals per day:</label>
-<input name="meals_per_day" placeholder="Meals per day">
+<label>Meals per day:</label>
+<input type="number" name="meals_per_day" required>
 
-<label for="cooking_style">Cooking Style:</label>
+<label>Cooking Style:</label>
 <select name="cooking_style">
 <option value="cook">Cook</option>
 <option value="outside">Eat Outside</option>
 <option value="both">Both</option>
 </select>
 
-<button type="submit">Generate AI Diet Plan</button>
+<button type="submit">Generate Diet Plan</button>
 </form>
 
 {% if result is defined %}
 <div class="result">
 
 <h3>Calories: {{ result.calories }}</h3>
+<p>Protein: {{ result.macros.protein_g }} g</p>
+<p>Carbs: {{ result.macros.carbs_g }} g</p>
+<p>Fat: {{ result.macros.fat_g }} g</p>
 
-<p>Protein: {{ result.macros.protein_g }}g</p>
-<p>Carbs: {{ result.macros.carbs_g }}g</p>
-<p>Fat: {{ result.macros.fat_g }}g</p>
+<table class="diet-table">
+<thead>
+<tr>
+<th>AI Diet Plan (Based on Meals per Day)</th>
+</tr>
+</thead>
 
-<h4>AI Diet Plan:</h4>
-<ul>
+<tbody id="dietBody">
+</tbody>
+</table>
+
+<div id="aiText" style="display:none;">
 {% for m in result.meals %}
-<li>{{ m.food }}</li>
+{{ m.food }}
 {% endfor %}
-</ul>
+</div>
 
 </div>
 {% endif %}
 
 </div>
+
+<script>
+
+const aiTextDiv = document.getElementById("aiText");
+const dietBody = document.getElementById("dietBody");
+
+if(aiTextDiv && dietBody){
+
+    const text = aiTextDiv.innerText.trim();
+    const lines = text.split("\n");
+
+    lines.forEach(line => {
+
+        if(line.trim() === "") return;
+
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+
+        // ⭐ Detect Meal Title
+        if(line.includes("(") && line.includes("AM") || line.includes("PM")){
+            cell.innerHTML = "<b style='color:#1d4ed8;font-size:16px'>" + line + "</b>";
+        }
+
+        // ⭐ Detect Calories line
+        else if(line.toLowerCase().includes("calories")){
+            cell.style.background = "#e0f2fe";
+            cell.style.fontWeight = "bold";
+            cell.textContent = line;
+        }
+
+        // ⭐ Normal food lines
+        else{
+            cell.textContent = line;
+        }
+
+        row.appendChild(cell);
+        dietBody.appendChild(row);
+
+    });
+}
+
+</script>
+
+
 </body>
 </html>
